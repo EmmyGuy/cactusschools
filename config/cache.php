@@ -74,6 +74,10 @@ return [
             'connection' => 'default',
         ],
 
+        // 'none' => [
+        //     'driver' => 'null',
+        // ],
+
     ],
 
     /*

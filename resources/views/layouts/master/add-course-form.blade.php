@@ -75,8 +75,10 @@
     </div>
   </div>
 <script>
-  $('#teacherDepartment{{$section->id}}').click(function () {
-    $("#assignTeacher{{$section->id}} option").hide();
-    $("#assignTeacher{{$section->id}} option[data-department="+$(this).val()+"]").show();
+  jQuery(document).ready(function($){
+    $('#teacherDepartment{{$section->id}}').click(function () {
+      $("#assignTeacher{{$section->id}} option").hide();
+      $("#assignTeacher{{$section->id}} option[data-department="+$(this).val()+"]").show();
+    });
   });
 </script>

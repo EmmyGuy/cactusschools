@@ -26,7 +26,7 @@
   </div>
 </div>
 <script>
-  $("#create-section-btn-class-{{$class->id}}").click(function(){
-    $("#create-section-btn-panel-class-{{$class->id}}").toggle();
-  });
+    $("#create-section-btn-class-{{$class->id}}").click(function(){
+      $("#create-section-btn-panel-class-{{$class->id}}").toggle();
+    });
 </script>

@@ -20,6 +20,7 @@ Auth::routes();
 Route::middleware(['auth', 'master'])->group(function () {
     Route::get('/masters', 'MasterController@index')->name('masters.index');
     Route::resource('/schools', 'SchoolController')->only(['index', 'edit', 'store', 'update']);
+    Route::get('/apiprops', 'MasterController@apiprops');
 });
 
 Route::get('/home', 'HomeController@index')->name('home');
@@ -269,4 +270,11 @@ Route::middleware(['auth', 'student'])->prefix('stripe')->group(function () {
     Route::get('charge', 'CashierController@index');
     Route::post('charge', 'CashierController@store');
     Route::get('receipts', 'PaymentController@index');
+    Route::get('redirect/{id}', 'CashierController@redirect');
+    Route::get('callback', ['uses' => 'CashierController@handleGatewayCallback', 'as' => 'callback']);
+    Route::post('pay', ['uses' => 'CashierController@redirectToGateway', 'as' => 'pay']);
+    Route::post('invoice', ['uses' => 'CashierController@getInvoice', 'as' => 'invoice']);
 });
+
+Route::get( '/_debugbar/assets/stylesheets', '\Barryvdh\Debugbar\Controllers\AssetController@css' );
+Route::get( '/_debugbar/assets/javascript', '\Barryvdh\Debugbar\Controllers\AssetController@js' );

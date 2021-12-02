@@ -35,4 +35,10 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'paystack' => [
+        'url' => 'https://api.paystack.co',
+        'publicKey' => '',
+        'secretKey' => '',
+    ],
+
 ];

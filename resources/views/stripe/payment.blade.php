@@ -50,26 +50,33 @@
                         </div>
                     @endif
                     <form action="{{url('stripe/charge')}}" method="post" id="payment-form">
+                    <!-- <form action="{{ route('invoice') }}" method="post" id="payment-form"> -->
                         {{ csrf_field() }}
                         <input type="hidden" id="stripe_key" name="stripe_key" value="{{env('STRIPE_KEY')}}">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">@lang('Enter your credit card information')</h3>
+                                <!-- <h3 class="panel-title">@lang('Enter your credit card information')</h3> -->
+                                <h3 class="panel-title">Payment Page</h3>
                             </div>
                             <div class="panel-body">
                               <div class="form-group">
                                 <label for="amount">@lang('Pay Fee For')</label>
-                                <select class="form-control" name="charge_field" required>
+                                <select class="form-control" name="charge_field" id='charge_field'  onchange="SetAmount()" required>
                                   @foreach ($fees_fields as $fees_field)
-                                    <option>{{$fees_field->fee_name}}</option>
+                                    <option value="{{$fees_field->expected_amount}}" >{{$fees_field->fee_name}}</option>
                                   @endforeach
                                 </select>
                               </div>
-                                <div class="form-group">
+
+                              <div class="form-group">
+                              <input type="checkbox" id='fulpay' name="fulpay" value="" onClick="myFunction()"> want to pay instalmentally? 
+                              </div>
+
+                              <div class="form-group">
                                   <label for="amount">@lang('Amount')</label>
                                   <div class="input-group">
                                     <div class="input-group-addon">$</div>
-                                    <input type=number step="any" class="form-control" id="amount" name="amount" placeholder="@lang('Amount')" required>
+                                    <input type="number" value="" class="form-control" id="amount" name="amount" placeholder="Enter amount you want to pay" required>
                                 </div>
                                 <br>
                                 <label for="card-element">@lang('Card Number')</label>
@@ -78,7 +85,11 @@
                                 </div>
                             </div>
                             <div class="panel-footer">
-                                <button class="btn btn-sm btn-success" type="submit">@lang('Pay')</button>
+                                <button class="btn btn-sm btn-success proceed-pay" type="submit">@lang('Pay')</button>
+                                <button class="btn btn-sm btn-default pull-right" id="get-invoice" type="button">@lang('invoice')</button>
+                            </div>
+                            <div id="download-invoce">
+
                             </div>
                         </div>
                     </form>
@@ -88,76 +99,66 @@
     </div>
 </div>
 <script src="https://js.stripe.com/v3/"></script>
+
 <script>
-// Create a Stripe client.
-var stripe = Stripe(document.getElementById('stripe_key').value);
+    jQuery(document).ready(function($){
+      $('#get-invoice').click(function(){
+        $.ajax({
+          data: $('#payment-form').serialize(),
+          url: '{!! route("invoice") !!}',
+          type: "POST",
+          dataType: 'json',
+          success: function (data) {
 
-// Create an instance of Elements.
-var elements = stripe.elements();
+            console.log(data.url);
+            $('#download_invoce').html(data);
+          },
+          error: function (data) {
+            alert('Oops!');
 
-// Custom styling can be passed to options when creating an Element.
-// (Note that this demo uses a wider set of styles than the guide below.)
-var style = {
-  base: {
-    color: '#32325d',
-    fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-    fontSmoothing: 'antialiased',
-    fontSize: '16px',
-    '::placeholder': {
-      color: '#aab7c4'
-    }
-  },
-  invalid: {
-    color: '#fa755a',
-    iconColor: '#fa755a'
-  }
-};
-
-// Create an instance of the card Element.
-var card = elements.create('card', {style: style});
-
-// Add an instance of the card Element into the `card-element` <div>.
-card.mount('#card-element');
-
-// Handle real-time validation errors from the card Element.
-card.addEventListener('change', function(event) {
-  var displayError = document.getElementById('card-errors');
-  if (event.error) {
-    displayError.textContent = event.error.message;
-  } else {
-    displayError.textContent = '';
-  }
-});
-
-// Handle form submission.
-var form = document.getElementById('payment-form');
-form.addEventListener('submit', function(event) {
-  event.preventDefault();
-
-  stripe.createToken(card).then(function(result) {
-    if (result.error) {
-      // Inform the user if there was an error.
-      var errorElement = document.getElementById('card-errors');
-      errorElement.textContent = result.error.message;
-    } else {
-      // Send the token to your server.
-      stripeTokenHandler(result.token);
-    }
+              console.log('Error:', data);
+          }
+      });
+    });
   });
-});
 
-// Submit the form with the token ID.
-function stripeTokenHandler(token) {
-  // Insert the token ID into the form so it gets submitted to the server
-  var form = document.getElementById('payment-form');
-  var hiddenInput = document.createElement('input');
-  hiddenInput.setAttribute('type', 'hidden');
-  hiddenInput.setAttribute('name', 'stripeToken');
-  hiddenInput.setAttribute('value', token.id);
-  form.appendChild(hiddenInput);
 
-  // Submit the form
-  form.submit();
-}
+  function myFunction() {
+        var x = document.getElementById("fulpay");
+        var amount = document.getElementById("amount");
+        if (x.checked == true) {
+          amount.value = '';
+          amount.readOnly = false;
+        } else {
+          amount.value = x.value;
+        }
+
+        if (x.checked == false && amount.value == '') {
+          document.getElementById("amount").value = x.value;
+          amount.readOnly = true;
+        }
+    } 
+
+    function SetAmount(){
+      var fee = document.getElementById("charge_field");
+      var amount = document.getElementById("amount");
+
+      amount.value = fee.value;
+      amount.readOnly = true;
+    }
+
 </script>
+<script>
+    jQuery(document).ready(function($){
+        function myFunction() {
+          var x = document.getElementById("fulpay");
+          if (x.checked == false) {
+            alert('checked');
+          } else {
+            alert('unchecked');
+          }
+      } 
+    });
+</script>
+
 @endsection
