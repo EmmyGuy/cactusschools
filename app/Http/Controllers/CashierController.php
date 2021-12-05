@@ -13,7 +13,7 @@ use LaravelDaily\Invoices\Classes\InvoiceItem;
 
 use App\Payment;
 use App\Fee;
-use App\Apikeys;
+use App\ApiKeys;
 use App\Customer;
 
 use Paystack;
@@ -63,7 +63,7 @@ class CashierController extends Controller
         $payment = Payment::where('id', $id)->get();
 
         //query paystack api keys from db for auth user
-        $apiDetail = Apikeys::where('school_id', $user->school_id)->first();
+        $apiDetail = ApiKeys::where('school_id', $user->school_id)->first();
         // var_dump($apiDetail->sub_act_code)
         if($apiDetail == null){
             return back()->with(['error'=>true,'status'=>__('Please contact CacTus Analytics for Payment Setup!')]);
@@ -154,7 +154,7 @@ class CashierController extends Controller
 
         $user = auth()->user();
         $splitName = explode(' ', $user->name, 2);
-        $apiDetail = Apikeys::where('school_id', $user->school_id)->first();
+        $apiDetail = ApiKeys::where('school_id', $user->school_id)->first();
 
         //Decrypt and update environment variable with keys 
         $publicKey = Crypt::decryptString($apiDetail->public);
